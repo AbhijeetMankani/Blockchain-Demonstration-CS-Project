@@ -35,3 +35,14 @@ def transaction(sender_id, receiver_id, amount):
 	else:
 		print("Insufficient Balance")
     
+
+def balance(user_id):
+	Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
+
+	index = None
+
+	for i in range(len(Acc)):
+	    if(Acc.Public_Key[i] == user_id):
+	        index = i
+	
+	print("Balance:", Acc.Balance[index])

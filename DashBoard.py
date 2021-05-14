@@ -1,15 +1,15 @@
 import hashlib
 import DashBoard_Commands
+import pandas as pd
 
 # Logging in Process
 pkey_ = input("Enter Public Key: ")
 Hash_priv_ = str(hashlib.sha256(input("Enter Private Key: ").encode()).hexdigest())
-Acc = open(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv', 'r')
-Ac = Acc.read()
-Acc.close()
-i = Ac.find(pkey_)
+Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
 
-if(Ac[i+65:i+129] == Hash_priv_):
+i = Acc.Public_Key.searchsorted(pkey_)
+
+if(Acc.Hashed_Private_Key[i] == Hash_priv_):
 	print("Login Successful")
 else:
 	print("Login Unsuccessful, Incorrect Public/Private Key")
@@ -35,7 +35,9 @@ while(action not in "Ee"):
 		print('\n')
 		#Transaction Code Goes Here
 	elif(action in "Bb"):
-		pass
+		DashBoard_Commands.balance(pkey_)
+
+		print('\n\n')
 		#Balance Check Code Goes Here
 	elif(action in "Ss"):
 		pass
