@@ -1,48 +1,63 @@
 import pandas as pd
+import nacl.signing
+import nacl.encoding
 
-def transaction(sender_id, receiver_id, amount):
+import mysql.connector
+
+
+
+def transaction(sender_id, receiver_id, amount, signing_key):
 	if(amount < 0): 
 		print("Invalid Amount")
 		return
-	Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
+	# Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
+	Connection = mysql.connector.connect(host='localhost', username='root', password='123456', database='Blockchain')
+	cursor = Connection.cursor()
+	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";"'''.format(Public_Key = sender_id)
+	cursor.execute(query)
+	sender_bal = cursor.fetchall()
+	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";"'''.format(Public_Key = receiver_id)
+	cursor.execute(query)
 
-	s_i = None
-	r_i = None
-
-	for i in range(len(Acc)):
-	    if(Acc.Public_Key[i] == sender_id):
-	        s_i = i
-	    if(Acc.Public_Key[i] == receiver_id):
-	        r_i = i
-
-	if(s_i == None):
+	receiver_bal = cursor.fetchall()
+	if(len(sender_bal) == 0):
 		print("Invalid Sender's ID")
 		return
-	if(r_i == None):
+	if(len(receiver_bal) == 0):
 		print("Invalid Reciever's ID")
 		return
-
-	if(Acc.Balance[s_i] >= amount):
-		Acc_ =  Acc.copy()
-		Acc_.loc[s_i, 'Balance'] -= amount
-
-		Acc_.loc[r_i, 'Balance'] += amount
-		print("Transaction Successful!")
-		Acc_.loc[s_i, 'Transactions_Done'] += 1
-		Acc_.loc[r_i, 'Transactions_Done'] += 1
-		Acc = Acc_.copy()
-		Acc.to_csv('Accounts.csv')
-	else:
+	if(sender_bal < amount):
 		print("Insufficient Balance")
+		return
+	
+	receiver_bal = receiver_bal[0][0]
+	sender_bal = sender_bal[0][0]
+
+	# Transaction in form of json to store in sql
+	transaction = '''{
+		"sender_id": "{sender_id}",
+		"receiver_id": "{receiver_id}",
+		"amount": "{amount}"
+	}'''.format(sender_id=sender_id, receiver_id=receiver_id, amount=amount)
+
+	# Regenerating key from hex
+	sign_key = nacl.signing.SigningKey(signing_key, encoder=nacl.encoding.HexEncoder)
+
+	signed_transaction = sign_key.sign(transaction)
+
+	
     
 
 def balance(user_id):
-	Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
+	Connection = mysql.connector.connect(host='localhost', username='root', password='123456', database='Blockchain')
+	cursor = Connection.cursor()
+	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";"'''.format(Public_Key = user_id)
 
-	index = None
+	cursor.execute(query)
 
-	for i in range(len(Acc)):
-	    if(Acc.Public_Key[i] == user_id):
-	        index = i
-	
-	print("Balance:", Acc.Balance[index])
+	bal = cursor.fetchall()[0][0]
+
+	print("Balance:", bal)
+
+def submit_nonce(nonce):
+	pass
