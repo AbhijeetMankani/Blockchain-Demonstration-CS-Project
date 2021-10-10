@@ -2,46 +2,53 @@ import datetime
 import hashlib
 from random import uniform
 
-import pandas as pd
+import mysql.connector
 
 # Digital Signature
 import nacl.encoding
 import nacl.signing
 
+MYSQL_PASS = open('.env').read()[6:]
 
-# Acc = open("C:\\Users\\Sunil\\Desktop\\Abhijeet\\TSS\\CS\\Grade 12 Project\\BlockChain\\Accounts.csv", "a+")
+Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
 
-Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
+if(Connection.is_connected()):
+	
+	cursor = Connection.cursor()
 
-Name = input("Enter Name: ")
-Age = input("Enter Age: ")
-DOB = input("Enter Date of Birth: \nDate: ")
-MOB = input("Month: ")
-YOB = input("Year: ")
-
-
-today = datetime.date.today()
-import base64
-
-s = Name+DOB+MOB+YOB+str(today.day)+str(today.month)+str(today.year) + str(uniform(0, 100000000000000))
-
-seed = s.encode('utf-32')
-seed = seed[:32]
+	Name = input("Enter Name: ")
+	Age = input("Enter Age: ")
+	DOB = input("Enter Date of Birth: \nDate: ")
+	MOB = input("Month: ")
+	YOB = input("Year: ")
 
 
-Private_KEY = nacl.signing.SigningKey(seed=seed).generate()
-Public_KEY = Private_KEY.verify_key
+	today = datetime.date.today()
+	import base64
 
-Private_KEY_hex = Private_KEY.encode(encoder=nacl.encoding.HexEncoder).decode()
-Public_KEY_hex = Public_KEY.encode(encoder=nacl.encoding.HexEncoder).decode()
+	s = Name+DOB+MOB+YOB+str(today.day)+str(today.month)+str(today.year) + str(uniform(0, 100000000000000))
 
-hashedPrivateKey = str(hashlib.sha256((Private_KEY_hex).encode()).hexdigest())
+	seed = s.encode('utf-32')
+	seed = seed[:32]
 
-Acc.loc[len(Acc)] = [Public_KEY_hex, hashedPrivateKey, 0, 0, 0]
-# Find way to remake the SigningKey Object from the hexcode/bytearray
-# DONE
 
-Acc.to_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv', index=False)
+	Private_KEY = nacl.signing.SigningKey(seed=seed).generate()
+	Public_KEY = Private_KEY.verify_key
 
-print("This is Your Public_KEY:", Public_KEY_hex)
-print("This is your Private_KEY(Do not Share):", Private_KEY_hex)
+	Private_KEY_hex = Private_KEY.encode(encoder=nacl.encoding.HexEncoder).decode()
+	Public_KEY_hex = Public_KEY.encode(encoder=nacl.encoding.HexEncoder).decode()
+
+	hashedPrivateKey = str(hashlib.sha256((Private_KEY_hex).encode()).hexdigest())
+
+	query = '''INSERT INTO Users VALUES ('{Public_KEY}', '{Hashed_Private_Key}', 0, 0, 0)'''.format(Public_KEY = Public_KEY_hex, Hashed_Private_Key = hashedPrivateKey)
+
+	cursor.execute(query)
+
+	Connection.commit()
+	cursor.close()
+	Connection.close()
+
+	print("This is Your Public_KEY:", Public_KEY_hex)
+	print("This is your Private_KEY(Do not Share):", Private_KEY_hex)
+else:
+	print("There was some error, please try again.")
