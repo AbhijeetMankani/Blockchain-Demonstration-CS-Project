@@ -1,6 +1,8 @@
 import nacl.signing
 import nacl.encoding
 
+import pickle
+
 import mysql.connector
 
 MYSQL_PASS = open('.env').read()[6:]
@@ -52,7 +54,8 @@ def transaction(sender_id, receiver_id, amount, signing_key):
 	signed_transaction = sign_key.sign(transaction)
 
 	signature = signed_transaction.signature.hex()
-	transaction = signed_transaction.message.decode()
+	# transaction = signed_transaction.message.decode()
+	transaction = transaction.decode()
 
 	query = '''INSERT INTO All_Transactions VALUES ("{T_ID}", "{Sender_ID}", "{Reciever_ID}", {Amount}, FALSE, '{transaction}', "{sign}");'''.format(T_ID = T_ID, Sender_ID = sender_id, Reciever_ID = receiver_id, Amount = amount, transaction = transaction, sign = signature)
 	cursor.execute(query)
@@ -79,5 +82,11 @@ def balance(user_id):
 	print("Balance:", bal)
 	Connection.close()
 
-def submit_nonce(nonce):
-	pass
+def submit_nonce(nonce, user_id):
+	Current_Block_File = open('Current Block.block', 'rb')
+	Block = pickle.load(Current_Block_File)
+	
+	# if(Block.checkNonce(str(nonce))):
+	Block.submitNonce(nonce, user_id)
+
+	Current_Block_File.close()
