@@ -42,19 +42,19 @@ def transaction(sender_id, receiver_id, amount, signing_key):
 	cursor.execute(query)
 	T_ID = cursor.fetchone()[0]
 
-	# Transaction in form of json to store in sql
+	# Transaction in form of Dict like string to store in sql
 	transaction = "{" + '''"Transaction_ID": {T_ID}, "sender_id": "{sender_id}", "receiver_id": "{receiver_id}", "amount": "{amount}"'''.format(T_ID= T_ID, sender_id=sender_id, receiver_id=receiver_id, amount=amount) + "}"
 
-	transaction = transaction.encode()
+
+	print(transaction)
 
 	# Regenerating key from hex
 	sign_key = nacl.signing.SigningKey(signing_key, encoder=nacl.encoding.HexEncoder)
 
-	signed_transaction = sign_key.sign(transaction)
+	signed_transaction = sign_key.sign(transaction.encode())
 
-	signature = signed_transaction.signature.hex()
-	# transaction = signed_transaction.message.decode()
-	transaction = transaction.decode()
+	signature = bytes.hex(signed_transaction.signature)
+
 
 	query = '''INSERT INTO All_Transactions VALUES ("{T_ID}", "{Sender_ID}", "{Reciever_ID}", {Amount}, FALSE, '{transaction}', "{sign}");'''.format(T_ID = T_ID, Sender_ID = sender_id, Reciever_ID = receiver_id, Amount = amount, transaction = transaction, sign = signature)
 	cursor.execute(query)

@@ -37,7 +37,7 @@ def mine_transaction(T_ID):
 		VKEY = nacl.signing.VerifyKey(sender_id, encoder=nacl.encoding.HexEncoder)
 		signed_message = bytes.fromhex(Transaction_Signature) + Transaction_Message.encode()
 		try:
-			VKEY.verify(signed_message)
+			VKEY.verify(Transaction_Message.encode(), bytes.fromhex(Transaction_Signature))
 			print('Signature Verified')
 		except nacl.signing.exc.BadSignatureError:
 			print("Invalid Transaction - Invalid/Corrupt Signature")
@@ -124,7 +124,3 @@ def send_reward(Block_ID, User_ID, Amount):
 	cursor.close()
 	Connection.close()
 	print("Reward Succesful; Reward-Transaction ready to be Mined.")
-
-
-# send_reward(1, '1d482ff9bf39b0f75deab0000575ac5bead1ddd51c7dc81c810bb1204d056f8f', 50)
-# mine_transaction(1)
