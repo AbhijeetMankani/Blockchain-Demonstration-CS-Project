@@ -24,5 +24,5 @@ ALTER TABLE All_Transactions ADD FOREIGN KEY (Reciever_ID) REFERENCES Users(Publ
 ALTER TABLE Unmined_Transactions ADD FOREIGN KEY (Transaction_ID) REFERENCES All_Transactions(Transaction_ID);
 ALTER TABLE Mined_Transactions ADD FOREIGN KEY (Transaction_ID) REFERENCES All_Transactions(Transaction_ID);
 
-ALTER TABLE Blocks ADD FOREIGN KEY (Previous_Block_Hash) REFERENCES Blocks(Block_Hash);
+
 ALTER TABLE Blocks ADD FOREIGN KEY (Submitter_ID) REFERENCES Users(Public_Key);

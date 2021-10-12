@@ -12,7 +12,6 @@ def transaction(sender_id, receiver_id, amount, signing_key):
 	if(amount < 0): 
 		print("Invalid Amount")
 		return
-	# Acc = pd.read_csv(r'C:\Users\Sunil\Desktop\Abhijeet\TSS\CS\Grade 12 Project\BlockChain\Accounts.csv')
 	Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
 	cursor = Connection.cursor()
 	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";'''.format(Public_Key = sender_id)

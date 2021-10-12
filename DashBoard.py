@@ -61,7 +61,7 @@ if(Connection.is_connected()):
 			#Balance Check Code Goes Here
 		elif(action in "Ss"):
 			nonce = input("Enter the Nonce for current block: ")
-			DashBoard_Commands.submit_nonce(nonce)
+			DashBoard_Commands.submit_nonce(nonce, pkey_)
 			#Submiting Nonce Code Goes Here
 
 	print("Exited, and Logged out")
