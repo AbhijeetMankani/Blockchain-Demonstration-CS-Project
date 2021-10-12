@@ -1,6 +1,4 @@
 import mysql.connector
-import nacl.signing
-import nacl.encoding
 import hashlib
 import pickle
 import time

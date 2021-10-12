@@ -17,8 +17,6 @@ commands = SQL_COMMANDS.readlines()
 
 SQL_COMMANDS.close()
 
-
-
 def Setup():
     Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS)
     cursor = Connection.cursor()
@@ -30,8 +28,6 @@ def Setup():
             ecx += 1
             print("Progress: {}/16".format(ecx))
     
-
-
     seed = '123456789123456789123456789132456789123456789123456789'.encode('utf-32')
     seed = seed[:32]
     Blockchain_KEY = nacl.signing.SigningKey(seed=seed).generate()
@@ -46,7 +42,6 @@ def Setup():
 
     cursor.execute(query)
 
-
     block_chain = Blockchain(Blockchain_Public_KEY_hex) # Creates the Blockchain file
     Blockchain_File = open('BlockChain.blockchain', 'wb')
     pickle.dump(block_chain, Blockchain_File)
@@ -56,8 +51,6 @@ def Setup():
     Current_Block_File = open('Current Block.block', 'wb')
     pickle.dump(block, Current_Block_File)
     Current_Block_File.close()
-
-
 
     Connection.commit()
     cursor.close()
