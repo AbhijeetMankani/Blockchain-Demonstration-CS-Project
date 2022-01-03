@@ -3,9 +3,9 @@ import DashBoard_Commands
 
 import mysql.connector
 
-MYSQL_PASS = open('.env').read()[6:]
+MYSQL_PASS = open('.env').read()[6:] # This Reads the Password for MYSQL from the .env file so you don't have to put it everywhere manually
 
-Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
 
 
 if(Connection.is_connected()):
@@ -35,7 +35,7 @@ if(Connection.is_connected()):
 	action = ' '
 
 	# Dashboard Commmands
-	while(action not in "Ee"):
+	while(action not in "Ee"): # Menu
 		print("Enter T to issue a Transaction")
 		print("Enter B to Check Balance")
 		print("Enter S to Submit Nonce for Ongoing Block")
@@ -43,7 +43,7 @@ if(Connection.is_connected()):
 		action = input()	
 		if(action not in "TtBbSsEe"):
 			print("Invalid Action\n\n")
-		elif(action in "Tt"):
+		elif(action in "Tt"): # Issuing Transaction
 			Reciever_ID = input("Enter reciever's ID: ")
 			amount = float(input("Enter Transaction Amount: "))
 			_priv_key = input("Enter Private Key to authorize transaction: ")
@@ -53,17 +53,14 @@ if(Connection.is_connected()):
 				print("You are unauthorized - logging out")
 				break
 			print('\n')
-			#Transaction Code Goes Here
-		elif(action in "Bb"):
+		elif(action in "Bb"): # Checking Balance
 			DashBoard_Commands.balance(pkey_)
 
 			print('\n\n')
-			#Balance Check Code Goes Here
-		elif(action in "Ss"):
+		elif(action in "Ss"): # Submit Nonce for Current Block
 			nonce = input("Enter the Nonce for current block: ")
 			DashBoard_Commands.submit_nonce(nonce, pkey_)
-			#Submiting Nonce Code Goes Here
 
 	print("Exited, and Logged out")
 else:
-	print("There was some error, please try again.")
+	print("There was some error, please try again.")	

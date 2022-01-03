@@ -8,9 +8,9 @@ import mysql.connector
 import nacl.encoding
 import nacl.signing
 
-MYSQL_PASS = open('.env').read()[6:]
+MYSQL_PASS = open('.env').read()[6:] # This Reads the Password for MYSQL from the .env file so you don't have to put it everywhere manually
 
-Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
 
 if(Connection.is_connected()):
 	

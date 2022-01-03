@@ -5,14 +5,14 @@ import pickle
 
 import mysql.connector
 
-MYSQL_PASS = open('.env').read()[6:]
+MYSQL_PASS = open('.env').read()[6:] # This Reads the Password for MYSQL from the .env file so you don't have to put it everywhere manually
 
 
-def transaction(sender_id, receiver_id, amount, signing_key):
+def transaction(sender_id, receiver_id, amount, signing_key): # Issues the Transaction, and keeps it ready to be mined
 	if(amount < 0): 
 		print("Invalid Amount")
 		return
-	Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+	Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
 	cursor = Connection.cursor()
 	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";'''.format(Public_Key = sender_id)
 	cursor.execute(query)
@@ -69,8 +69,8 @@ def transaction(sender_id, receiver_id, amount, signing_key):
 	
     
 
-def balance(user_id):
-	Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+def balance(user_id): # Prints the User's balance'
+	Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
 	cursor = Connection.cursor()
 	query = '''SELECT Balance FROM Users WHERE Public_Key="{Public_Key}";"'''.format(Public_Key = user_id)
 
@@ -81,7 +81,7 @@ def balance(user_id):
 	print("Balance:", bal)
 	Connection.close()
 
-def submit_nonce(nonce, user_id):
+def submit_nonce(nonce, user_id): # Submits the Nonce for the current Block
 	Current_Block_File = open('Current Block.block', 'rb')
 	Block = pickle.load(Current_Block_File)
 	

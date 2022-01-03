@@ -1,2 +1,2 @@
 import Blockchain
-Blockchain.Setup()
+Blockchain.Setup() # Running Blockchain Setup Function

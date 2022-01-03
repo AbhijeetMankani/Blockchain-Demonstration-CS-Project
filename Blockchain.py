@@ -7,17 +7,18 @@ import nacl.signing
 import nacl.encoding
 
 
-MYSQL_PASS = open('.env').read()[6:]
+MYSQL_PASS = open('.env').read()[6:] # This Reads the Password for MYSQL from the .env file so you don't have to put it everywhere manually
 
 from Commands import difficulty
 
+# Reading the SQL Setup commands to Setup the Blockchain
 SQL_COMMANDS = open('Setup SQL.sql')
 
 commands = SQL_COMMANDS.readlines()
 
 SQL_COMMANDS.close()
 
-def Setup():
+def Setup(): # Executes the commands to Setup the Blockchain
     Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS)
     cursor = Connection.cursor()
     ecx = 0
@@ -28,6 +29,7 @@ def Setup():
             ecx += 1
             print("Progress: {}/16".format(ecx))
     
+    # Generating the Account that will be the Blochain, the Account that gives out the BLOCK-MINE-REWARD
     seed = '123456789123456789123456789132456789123456789123456789'.encode('utf-32')
     seed = seed[:32]
     Blockchain_KEY = nacl.signing.SigningKey(seed=seed).generate()
@@ -42,11 +44,13 @@ def Setup():
 
     cursor.execute(query)
 
+    # Saves the Blockchain object in a .blockchain binary file
     block_chain = Blockchain(Blockchain_Public_KEY_hex) # Creates the Blockchain file
     Blockchain_File = open('BlockChain.blockchain', 'wb')
     pickle.dump(block_chain, Blockchain_File)
     Blockchain_File.close()
 
+    # Saves the Currect Block object in a .block binary file
     block = Block(0, [], None) # Creates The Block File
     Current_Block_File = open('Current Block.block', 'wb')
     pickle.dump(block, Current_Block_File)
@@ -59,8 +63,8 @@ def Setup():
     print("Setup Successful!")
         
 
-class Block():
-    def __init__(self, Block_ID, Transactions_IDS, PreiousBlockHash):
+class Block(): # The Class that holds the Structure for the Block Object
+    def __init__(self, Block_ID, Transactions_IDS, PreiousBlockHash): # Initializes the Block
 
 
         Blockchain_File = open('BlockChain.blockchain', 'rb')
@@ -85,8 +89,8 @@ class Block():
             'Reward Winner': ''
         }
     
-    def checkNonce(self, Nonce):
-        Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+    def checkNonce(self, Nonce): # Checks if the Nonce Submitted is valid
+        Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
         cursor = Connection.cursor()
 
         # Unmined_Transactions
@@ -107,9 +111,9 @@ class Block():
             return False
         Connection.close()
 
-    def submitNonce(self, Nonce, User_ID):
+    def submitNonce(self, Nonce, User_ID): # If the Submitted Nonce is Valid, submits the Nonce, and mines the Block
         if (self.checkNonce(Nonce)):
-            Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+            Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
             cursor = Connection.cursor()
 
             # Unmined_Transactions
@@ -128,15 +132,8 @@ class Block():
             }
             Commands.send_reward(self.BlockBody['Block_ID'], User_ID, self.MiningReward)
 
-            for transaction in self.BlockBody['Transactions_IDS']: #! The Trasaction made by User aren't getting Mined, even though they are in the block's list
+            for transaction in self.BlockBody['Transactions_IDS']: 
                 done = Commands.mine_transaction(transaction)
-                # not_done=[]
-                # if(not done):
-                    # self.BlockBody['Transactions_IDS'].remove(transaction)
-                    # not_done.append(transaction)
-                # print(transaction)
-            # for i in not_done:
-            #     self.BlockBody['Transactions_IDS'].remove(i)
 
             Blockchain_File = open('BlockChain.blockchain', 'rb')
 
@@ -145,27 +142,27 @@ class Block():
             
             Blockchain_File.close()
 
-            Blockchain_File = open('BlockChain.blockchain', 'wb')
+            Blockchain_File = open('BlockChain.blockchain', 'wb') # Updates the Blockchain.blockchain file
 
             pickle.dump(block_chain, Blockchain_File)
 
             Blockchain_File.close()
 
             block = Block(block_chain.ChainLength, [], block_chain.Blocks[-1].block['BlockHash'])
-            Current_Block_File = open('Current Block.block', 'wb')
+            Current_Block_File = open('Current Block.block', 'wb')# Updates the Current Block.block file ith new block
             pickle.dump(block, Current_Block_File)
             Current_Block_File.close()         
 
         
 
-class Blockchain:
-    def __init__(self, Blockchain_Public_KEY):
+class Blockchain: # The Class that holds the Structure for the Blockchain Object
+    def __init__(self, Blockchain_Public_KEY): # Initializes the Blockchain
         self.Blocks = []
         self.ChainLength = 0
         self.Blockchain_KEY = Blockchain_Public_KEY
 
-    def addMinedBlock(self, Block):
-        Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain')
+    def addMinedBlock(self, Block): # Adds a new block to the end of the Blockchain
+        Connection = mysql.connector.connect(host='localhost', username='root', password=MYSQL_PASS, database='Blockchain') # Making the MYSQL connection
         cursor = Connection.cursor()
 
         self.Blocks.append(Block)
